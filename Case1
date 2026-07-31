@@ -1,0 +1,175 @@
+import datetime
+import calendar
+
+# Шаблоны цифр для "электронного табло" (7x7)
+DIGITS = {
+    '0': [" *** ",
+          "*   *",
+          "*   *",
+          "*   *",
+          "*   *",
+          "*   *",
+          " *** "],
+    '1': ["  *  ",
+          " **  ",
+          "* *  ",
+          "  *  ",
+          "  *  ",
+          "  *  ",
+          "*****"],
+    '2': [" *** ",
+          "*   *",
+          "    *",
+          "   * ",
+          "  *  ",
+          " *   ",
+          "*****"],
+    '3': [" *** ",
+          "*   *",
+          "    *",
+          "  ** ",
+          "    *",
+          "*   *",
+          " *** "],
+    '4': ["   * ",
+          "  ** ",
+          " * * ",
+          "*  * ",
+          "*****",
+          "   * ",
+          "   * "],
+    '5': ["*****",
+          "*    ",
+          "*    ",
+          " *** ",
+          "    *",
+          "*   *",
+          " *** "],
+    '6': [" *** ",
+          "*   *",
+          "*    ",
+          "**** ",
+          "*   *",
+          "*   *",
+          " *** "],
+    '7': ["*****",
+          "    *",
+          "   * ",
+          "  *  ",
+          " *   ",
+          "*    ",
+          "*    "],
+    '8': [" *** ",
+          "*   *",
+          "*   *",
+          " *** ",
+          "*   *",
+          "*   *",
+          " *** "],
+    '9': [" *** ",
+          "*   *",
+          "*   *",
+          " ****",
+          "    *",
+          "*   *",
+          " *** "],
+    ' ': ["     ",
+          "     ",
+          "     ",
+          "     ",
+          "     ",
+          "     ",
+          "     "]
+}
+
+def get_weekday(day, month, year):
+    """Определяет день недели по дате."""
+    try:
+        date_obj = datetime.date(year, month, day)
+        weekdays = ["Понедельник", "Вторник", "Среда", "Четверг", 
+                    "Пятница", "Суббота", "Воскресенье"]
+        return weekdays[date_obj.weekday()]
+    except ValueError:
+        return None
+
+def is_leap_year(year):
+    """Определяет, високосный ли год."""
+    return calendar.isleap(year)
+
+def calculate_age(day, month, year):
+    """Вычисляет текущий возраст пользователя."""
+    today = datetime.date.today()
+    birth_date = datetime.date(year, month, day)
+    
+    # Проверка, был ли день рождения в этом году
+    age = today.year - birth_date.year
+    if (today.month, today.day) < (birth_date.month, birth_date.day):
+        age -= 1
+    return age
+
+def print_star_date(date_str):
+    """Выводит дату в формате электронного табло звёздочками."""
+    # Разбиваем строку даты на отдельные символы
+    lines = [""] * 7
+    
+    for char in date_str:
+        digit_pattern = DIGITS.get(char, DIGITS[' '])
+        for i in range(7):
+            lines[i] += digit_pattern[i] + "  "  # Добавляем пробел между цифрами
+    
+    # Выводим результат
+    print("\n" + "="*50)
+    print("Дата рождения на электронном табло:")
+    print("="*50)
+    for line in lines:
+        print(line)
+    print("="*50)
+
+def main():
+    """Главная функция программы."""
+    print("="*50)
+    print("ПРОГРАММА АНАЛИЗА ДАТЫ РОЖДЕНИЯ")
+    print("="*50)
+    
+    while True:
+        try:
+            # Запрашиваем данные у пользователя
+            day = int(input("\nВведите день рождения (1-31): "))
+            month = int(input("Введите месяц рождения (1-12): "))
+            year = int(input("Введите год рождения (например, 1990): "))
+            
+            # Проверяем корректность даты
+            birth_date = datetime.date(year, month, day)
+            break
+        except ValueError as e:
+            print(f"\nОшибка: Некорректная дата! ({e})")
+            print("Пожалуйста, попробуйте снова.")
+        except Exception as e:
+            print(f"\nОшибка: {e}")
+            print("Пожалуйста, попробуйте снова.")
+    
+    # Анализируем дату
+    print("\n" + "="*50)
+    print("РЕЗУЛЬТАТЫ АНАЛИЗА")
+    print("="*50)
+    
+    # День недели
+    weekday = get_weekday(day, month, year)
+    print(f"📅 День недели: {weekday}")
+    
+    # Високосный год
+    leap_status = "ДА (високосный)" if is_leap_year(year) else "НЕТ (невисокосный)"
+    print(f"📆 Високосный год: {leap_status}")
+    
+    # Возраст
+    age = calculate_age(day, month, year)
+    print(f"🎂 Возраст: {age} лет")
+    
+    # Форматируем дату для вывода на табло
+    formatted_date = f"{day:02d} {month:02d} {year:04d}"
+    
+    # Выводим дату звёздочками
+    print_star_date(formatted_date)
+
+if __name__ == "__main__":
+    main()
