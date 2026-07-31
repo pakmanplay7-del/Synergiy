@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивный калькулятор</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: gradientShift 10s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-field.error {
+            border-color: #ff4757;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .calc-btn {
+            padding: 18px 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calc-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .calc-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .calc-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-sum { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .btn-diff { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-mult { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .btn-div { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.4); }
+        }
+
+        .result-label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .result-display {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            word-break: break-word;
+        }
+
+        .result-error {
+            color: #ff4757;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .result-success {
+            color: #10ac84;
+        }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .input-fields-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+        }
+
+        .operator-symbol {
+            font-size: 2rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .calculator {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-value {
+                font-size: 2rem;
+            }
+            
+            .input-fields-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .operator-symbol {
+                display: none;
+            }
+        }
+
+        .example-hint {
+            text-align: center;
+            margin-top: 10px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>🧮 Калькулятор</h1>
+        
+        <div class="input-fields-container">
+            <div class="input-wrapper">
+                <label class="input-label" for="num1">Первое число</label>
+                <input type="text" id="num1" class="input-field" placeholder="Например: 10" value="">
+            </div>
+            
+            <div class="operator-symbol">+</div>
+            
+            <div class="input-wrapper">
+                <label class="input-label" for="num2">Второе число</label>
+                <input type="text" id="num2" class="input-field" placeholder="Например: 5" value="">
+            </div>
+        </div>
+        
+        <div class="buttons-grid">
+            <button class="calc-btn btn-sum" data-operation="sum">
+                ➕ Сумма
+            </button>
+            <button class="calc-btn btn-diff" data-operation="difference">
+                ➖ Разность
+            </button>
+            <button class="calc-btn btn-mult" data-operation="product">
+                ✖️ Произведение
+            </button>
+            <button class="calc-btn btn-div" data-operation="division">
+                ➗ Деление
+            </button>
+        </div>
+        
+        <div class="result-container">
+            <div class="result-label">Результат:</div>
+            <div class="result-display">
+                <div id="result" class="result-value">0</div>
+            </div>
+        </div>
+        
+        <button class="clear-btn" id="clearBtn">
+            🗑️ Очистить
+        </button>
+        
+        <div class="example-hint">
+            Поддерживаются целые и десятичные числа (через точку)
+        </div>
+    </div>
+
+    <script>
+        // Функции математических операций
+        const operations = {
+            sum: (a, b) => a + b,
+            difference: (a, b) => a - b,
+            product: (a, b) => a * b,
+            division: (a, b) => {
+                if (b === 0) {
+                    throw new Error('Деление на ноль невозможно');
+                }
+                return a / b;
+            }
+        };
+
+        // Получаем элементы DOM
+        const num1Input = document.getElementById('num1');
+        const num2Input = document.getElementById('num2');
+        const resultDiv = document.getElementById('result');
+        const buttons = document.querySelectorAll('[data-operation]');
+        const clearBtn = document.getElementById('clearBtn');
+        const operatorSymbol = document.querySelector('.operator-symbol');
+
+        // Функция для получения чисел из инпутов
+        function getNumbers() {
+            const num1Str = num1Input.value.trim();
+            const num2Str = num2Input.value.trim();
+            
+            // Проверка на пустые поля
+            if (num1Str === '' || num2Str === '') {
+                throw new Error('Заполните оба поля');
+            }
+            
+            // Заменяем запятую на точку (для удобства пользователей)
+            const num1 = parseFloat(num1Str.replace(',', '.'));
+            const num2 = parseFloat(num2Str.replace(',', '.'));
+            
+            // Проверка на NaN
+            if (isNaN(num1) || isNaN(num2)) {
+                throw new Error('Введите корректные числа');
+            }
+            
+            return { num1, num2 };
+        }
+
+        // Функция для отображения результата
+        function displayResult(value, isError = false) {
+            resultDiv.textContent = value;
+            resultDiv.className = 'result-value';
+            
+            if (isError) {
+                resultDiv.classList.add('result-error');
+                // Анимация ошибки
+                resultDiv.style.animation = 'none';
+                setTimeout(() => {
+                    resultDiv.style.animation = 'shake 0.3s ease';
+                }, 10);
+            } else {
+                resultDiv.classList.add('result-success');
+                // Добавляем знак плюс для положительных чисел
+                if (typeof value === 'number' && value > 0 && !Number.isInteger(value)) {
+                    // Округляем до 4 знаков после запятой для десятичных
+                    if (value.toString().split('.')[1]?.length > 4) {
+                        resultDiv.textContent = value.toFixed(4);
+                    }
+                }
+            }
+            
+            // Убираем анимацию через секунду
+            setTimeout(() => {
+                resultDiv.style.animation = '';
+            }, 300);
+        }
+
+        // Функция для форматирования результата
+        function formatResult(result) {
+            if (typeof result === 'number') {
+                // Проверяем, является ли число очень большим или маленьким
+                if (Math.abs(result) > 1e10 || (Math.abs(result) < 1e-6 && result !== 0)) {
+                    return result.toExponential(4);
+                }
+                
+                // Округляем до разумного количества знаков
+                const rounded = Math.round(result * 10000) / 10000;
+                
+                // Если число целое - показываем без десятичных знаков
+                if (Number.isInteger(rounded)) {
+                    return rounded.toString();
+                }
+                
+                return rounded.toString();
+            }
+            return result;
+        }
+
+        // Обработчик операций
+        function handleOperation(operationType) {
+            try {
+                // Убираем классы ошибок с инпутов
+                num1Input.classList.remove('error');
+                num2Input.classList.remove('error');
+                
+                // Получаем числа
+                const { num1, num2 } = getNumbers();
+                
+                // Выполняем операцию
+                const result = operations[operationType](num1, num2);
+                
+                // Форматируем и отображаем результат
+                const formattedResult = formatResult(result);
+                displayResult(formattedResult, false);
+                
+                // Обновляем символ оператора
+                const symbols = {
+                    sum: '+',
+                    difference: '-',
+                    product: '×',
+                    division: '÷'
+                };
+                operatorSymbol.textContent = symbols[operationType];
+                
+                // Добавляем анимацию успеха
+                resultDiv.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    resultDiv.style.transform = 'scale(1)';
+                }, 200);
+                
+            } catch (error) {
+                // Отображаем ошибку
+                displayResult(error.message, true);
+                
+                // Подсвечиваем поля с ошибкой
+                if (error.message.includes('числа')) {
+                    num1Input.classList.add('error');
+                    num2Input.classList.add('error');
+                } else if (error.message.includes('деление на ноль')) {
+                    num2Input.classList.add('error');
+                } else if (error.message.includes('Заполните')) {
+                    if (num1Input.value.trim() === '') num1Input.classList.add('error');
+                    if (num2Input.value.trim() === '') num2Input.classList.add('error');
+                }
+                
+                // Воспроизводим звук ошибки (опционально)
+                // const audio = new Audio('data:audio/wav;base64,...');
+                // audio.play();
+            }
+        }
+
+        // Функция очистки
+        function clearCalculator() {
+            num1Input.value = '';
+            num2Input.value = '';
+            resultDiv.textContent = '0';
+            resultDiv.className = 'result-value';
+            num1Input.classList.remove('error');
+            num2Input.classList.remove('error');
+            operatorSymbol.textContent = '+';
+            
+            // Фокус на первое поле
+            num1Input.focus();
+            
+            // Анимация очистки
+            resultDiv.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                resultDiv.style.transform = '';
+            }, 300);
+        }
+
+        // Добавляем обработчики на кнопки операций
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const operation = button.dataset.operation;
+                handleOperation(operation);
+            });
+        });
+
+        // Обработчик кнопки очистки
+        clearBtn.addEventListener('click', clearCalculator);
+
+        // Добавляем поддержку клавиатуры
+        document.addEventListener('keydown', (e) => {
+            // Enter - выполнить последнюю операцию или сумму по умолчанию
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleOperation('sum');
+            }
+            
+            // Escape - очистить
+            if (e.key === 'Escape') {
+                clearCalculator();
+            }
+            
+            // Цифровые клавиши для быстрого ввода
+            if (e.key >= '0' && e.key <= '9') {
+                if (document.activeElement !== num1Input && 
+                    document.activeElement !== num2Input) {
+                    num1Input.focus();
+                }
+            }
+            
+            // Горячие клавиши для операций
+            if (e.altKey) {
+                switch(e.key) {
+                    case '1':
+                    case 's':
+                        e.preventDefault();
+                        handleOperation('sum');
+                        break;
+                    case '2':
+                    case 'd':
+                        e.preventDefault();
+                        handleOperation('difference');
+                        break;
+                    case '3':
+                    case 'p':
+                        e.preventDefault();
+                        handleOperation('product');
+                        break;
+                    case '4':
+                    case 'v':
+                        e.preventDefault();
+                        handleOperation('division');
+                        break;
+                }
+            }
+        });
+
+        // Автоматическое форматирование при вводе
+        num1Input.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (value && !isNaN(parseFloat(value.replace(',', '.')))) {
+                const num = parseFloat(value.replace(',', '.'));
+                this.value = num.toString();
+            }
+        });
+
+        num2Input.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (value && !isNaN(parseFloat(value.replace(',', '.')))) {
+                const num = parseFloat(value.replace(',', '.'));
+                this.value = num.toString();
+            }
+        });
+
+        // Предотвращаем ввод недопустимых символов
+        [num1Input, num2Input].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                const char = e.key;
+                const currentValue = e.target.value;
+                
+                // Разрешаем цифры, точку, запятую и минус
+                if (!/[\d.,\-]/.test(char)) {
+                    e.preventDefault();
+                }
+                
+                // Запрещаем вторую точку/запятую
+                if ((char === '.' || char === ',') && 
+                    (currentValue.includes('.') || currentValue.includes(','))) {
+                    e.preventDefault();
+                }
+                
+                // Минус только в начале
+                if (char === '-' && currentValue.length > 0) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Очистка ошибки при вводе
+            input.addEventListener('input', () => {
+                input.classList.remove('error');
+            });
+        });
+
+        // Установка начальных значений для демонстрации
+        num1Input.value = '10';
+        num2Input.value = '5';
+        
+        // Фокус на первое поле при загрузке
+        num1Input.focus();
+        num1Input.select();
+
+        // Добавляем примеры при двойном клике на заголовок
+        document.querySelector('h1').addEventListener('dblclick', () => {
+            num1Input.value = '42';
+            num2Input.value = '7';
+            handleOperation('division');
+        });
+
+        console.log('🧮 Калькулятор готов к работе!');
+        console.log('Горячие клавиши:');
+        console.log('Alt+1 или Alt+S - Сумма');
+        console.log('Alt+2 или Alt+D - Разность');
+        console.log('Alt+3 или Alt+P - Произведение');
+        console.log('Alt+4 или Alt+V - Деление');
+        console.log('Enter - Выполнить операцию');
+        console.log('Escape - Очистить');
+    </script>
+</body>
+</html>
