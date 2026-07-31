@@ -1,0 +1,102 @@
+class Counter {
+    constructor() {
+        this.value = 0;
+        this.display = document.getElementById('counterDisplay');
+        this.messageDisplay = document.getElementById('messageDisplay');
+        this.plusBtn = document.getElementById('plusBtn');
+        this.minusBtn = document.getElementById('minusBtn');
+        
+        this.init();
+    }
+    
+    init() {
+        // Добавляем слушатели событий
+        this.plusBtn.addEventListener('click', () => this.increment());
+        this.minusBtn.addEventListener('click', () => this.decrement());
+        
+        // Инициализируем начальное состояние
+        this.updateDisplay();
+        this.updateButtonStates();
+        this.updateMessage();
+    }
+    
+    increment() {
+        if (this.value < 10) {
+            this.value++;
+            this.updateDisplay();
+            this.updateButtonStates();
+            this.updateMessage();
+        }
+    }
+    
+    decrement() {
+        if (this.value > -10) {
+            this.value--;
+            this.updateDisplay();
+            this.updateButtonStates();
+            this.updateMessage();
+        }
+    }
+    
+    updateDisplay() {
+        // Обновляем значение на дисплее
+        this.display.textContent = this.value;
+        
+        // Обновляем цвет фона в зависимости от значения
+        this.display.classList.remove('positive', 'negative', 'zero');
+        
+        if (this.value > 0) {
+            this.display.classList.add('positive');
+        } else if (this.value < 0) {
+            this.display.classList.add('negative');
+        } else {
+            this.display.classList.add('zero');
+        }
+    }
+    
+    updateButtonStates() {
+        // Деактивируем кнопку "+" при достижении 10
+        this.plusBtn.disabled = this.value >= 10;
+        
+        // Деактивируем кнопку "-" при достижении -10
+        this.minusBtn.disabled = this.value <= -10;
+    }
+    
+    updateMessage() {
+        // Показываем сообщение при достижении экстремальных значений
+        if (this.value === 10 || this.value === -10) {
+            this.messageDisplay.textContent = '⚠️ Вы достигли экстремального значения ⚠️';
+            this.messageDisplay.classList.add('show');
+        } else {
+            this.messageDisplay.textContent = '';
+            this.messageDisplay.classList.remove('show');
+        }
+    }
+}
+
+// Инициализируем счетчик после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    new Counter();
+});
+
+// Дополнительная функциональность: поддержка клавиатуры
+document.addEventListener('keydown', (e) => {
+    const counter = document.querySelector('.counter-display');
+    if (!counter) return;
+    
+    const currentValue = parseInt(counter.textContent);
+    
+    if (e.key === '+' || e.key === '=') {
+        e.preventDefault();
+        const plusBtn = document.getElementById('plusBtn');
+        if (!plusBtn.disabled) {
+            plusBtn.click();
+        }
+    } else if (e.key === '-' || e.key === '_') {
+        e.preventDefault();
+        const minusBtn = document.getElementById('minusBtn');
+        if (!minusBtn.disabled) {
+            minusBtn.click();
+        }
+    }
+});
