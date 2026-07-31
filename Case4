@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.counter-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.counter-display {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5em;
+    font-weight: bold;
+    color: #333;
+    background-color: #ff4444;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.counter-display.positive {
+    background-color: #ffd700;
+}
+
+.counter-display.negative {
+    background-color: #4caf50;
+}
+
+.counter-display.zero {
+    background-color: #ff4444;
+}
+
+.counter-display:hover {
+    transform: scale(1.02);
+}
+
+.message-display {
+    min-height: 40px;
+    margin: 20px auto;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #ff6b6b;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.message-display.show {
+    background: rgba(255, 107, 107, 0.1);
+    animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.counter-btn {
+    width: 80px;
+    height: 80px;
+    border: none;
+    border-radius: 5px;
+    font-size: 3em;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.minus-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.plus-btn {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.counter-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.counter-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.counter-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 600px) {
+    .counter-card {
+        padding: 30px 20px;
+    }
+    
+    .counter-display {
+        width: 150px;
+        height: 150px;
+        font-size: 3.5em;
+    }
+    
+    .counter-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5em;
+    }
+    
+    .button-group {
+        gap: 20px;
+    }
+    
+    .title {
+        font-size: 1.5em;
+    }
+}
